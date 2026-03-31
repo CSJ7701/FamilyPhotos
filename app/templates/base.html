@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Family Photos{% endblock %}</title>
+
+    {# --- Tailwind (CDN for dev) --- #}
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    {# Space for page-specific head content #}
+    {% block head %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
+
+    <!-- Navbar -->
+    <header class="w-full bg-white border-b shadow-sm">
+        <nav class="max-w-5xl mx-auto flex items-center justify-between py-4 px-4">
+            <a href="/" class="text-xl font-semibold tracking-tight">
+                Family Photos
+            </a>
+
+            <div class="space-x-4 text-sm">
+                <a href="/albums" class="text-gray-700 hover:text-black">
+                    Albums
+                </a>
+                <a href="/users" class="text-gray-700 hover:text-black">
+                    Users
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full border-t mt-8 py-4 text-center text-sm text-gray-500">
+        Blame Michael if there are any problems...
+    </footer>
+
+    {# Space for page scripts #}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{ album.albumName }}</h2>
+{% with items=assets, columns=3 %}
+{% include "components/gallery_masonry.html" %}
+{% endwith %}
+
+{% endblock %}

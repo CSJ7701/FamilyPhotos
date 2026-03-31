@@ -1,0 +1,15 @@
+
+* Family Photo Site
+
+This project is meant to serve as an attractive, clean frontend for an Immich server. Rather than the "gallery" view that Immich provides, this is meant to be an interface geared more toward families and non-technical users.
+
+
+* Roadmap
+
+** Basic Functionality
+- [ ] Running web server (Python + FastAPI)
+
+
+
+** Integrations
+- [ ] Plug into existing Immich instance

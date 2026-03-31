@@ -1,0 +1,9 @@
+
+services:
+  web:
+    build: .
+    container_name: family-photo-site
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    env_file: .env
