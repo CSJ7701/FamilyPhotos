@@ -33,7 +33,7 @@ Create a containerized, Python-based web application to serve as a central "land
 
 ** User Management
 - [ ] *Account Requests:* Unauthenticated users can submit a request (Name, Email, Password). Requests are reviewed by an admin.
-- [ ] *Authentication:* Login/Password hashing (Argon2 or bcrypt).
+- [ ] *Authentication:* Login/Password hashing (Argon2 or bcrypt). All users will access immich content using a master API key.
 - [ ] *Admin Dashboard:*
   - Approve/Deny pending account requests.
   - Configure Immich API URL and default Album ID for carousel.

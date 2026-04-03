@@ -1,5 +1,8 @@
 fastapi
 uvicorn[standard]
-jinja2
+fastapi-users[sqlalchemy]
 pydantic-settings
 httpx
+jinja2
+python-multipart
+slowapi
