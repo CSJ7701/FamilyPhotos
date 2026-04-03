@@ -9,13 +9,16 @@ Create a containerized, Python-based web application to serve as a central "land
 * Technical Requirements
 ** Backend
 - *Language:* Python 3.11+
-- *Framework:* FastAPI (recommended for high-performance async API calls to Immich) or Flask.
-- *Auth:* OAuth2 or session-based authentication with a local SQLite/PostgreSQL database for user management.
-- *Integration:* Immich REST API (using ~python-requests~ or ~httpx~).
+- *Framework:* FastAPI
+- *Auth:* FastAPI Users
+- *DB:* SQLite
+- *Settings:* pydantic-settings
+- *Integration:* Immich REST API (~httpx~).
+- *Secondary*: Slowapi (rate-limiting), middleware
 
 ** Frontend
-- *Templating:* Jinja2 (server-side rendering) or a lightweight JS framework.
-- *Styling:* CSS Grid/Flexbox or Tailwind CSS for a responsive layout.
+- *Templating:* Jinja2
+- *Styling:* Tailwind CSS
 - *Carousel:* Swiper.js or a simple CSS-based scroll snapper.
 
 ** Infrastructure
@@ -24,19 +27,24 @@ Create a containerized, Python-based web application to serve as a central "land
 
 * Functional Requirements
 ** Public Landing Page
-- [ ] *Announcements Section:* Markdown-based text or simple DB-stored strings.
+- [ ] *Announcements Section:* Markdown-based text. Pulled from a local file.
 - [ ] *Immich Carousel:* Fetch images from a specific ~ALBUM_ID~ via the Immich API.
-- [ ] *Flavor Text:* Configurable header/footer text for a "homey" feel.
 - [ ] *Navigation Bar:* Context-aware links (Login/Logout, Photos, Profile).
 
 ** User Management
-- [ ] *Account Requests:* Unauthenticated users can submit a request (Username, Email, Reason).
+- [ ] *Account Requests:* Unauthenticated users can submit a request (Name, Email, Password). Requests are reviewed by an admin.
 - [ ] *Authentication:* Login/Password hashing (Argon2 or bcrypt).
 - [ ] *Admin Dashboard:*
   - Approve/Deny pending account requests.
   - Configure Immich API URL and default Album ID for carousel.
-  - Configure default album for photo upload.
+  - Configure default album for photo upload, along with other settings.
   - Manage existing users.
+
+** Settings Management
+- [ ] *Config File*: Simple config file or env parsing (pydantic-settings)
+  - Admin can adjust settings from the web interface
+  - Changing settings writes to the config file
+  - Settings changed in-interface should persist server reboot
 
 ** Photos Page (Protected)
 - [ ] *Authorization:* Redirect to login if no active session.
@@ -44,33 +52,38 @@ Create a containerized, Python-based web application to serve as a central "land
 - [ ] *Photo Upload*: 'Upload' button should allow users to upload local photos to the Immich server. These should be placed into an admin specified album within Immich for sorting later.
 
 * Development Process
-** Phase 1: Environment & Immich Integration
-1. Initialize Git repository.
-2. Draft ~docker-compose.yml~ with Python app and PostgreSQL/SQLite.
-3. Create a basic FastAPI/Flask app that successfully authenticates with the Immich API using an API Key.
-4. Implement the "Featured Carousel" logic on a boilerplate homepage.
 
-** Phase 2: Authentication System
-1. Define SQLAlchemy/SQLModel schemas for ~Users~ and ~AccountRequests~.
-2. Build the "Request Account" form.
-3. Implement session-based login and a basic Admin role check.
-4. Build the Admin view to toggle user "Active" status.
+** Phase 0: Initial Env and Directory Setup
+Goal: Establish a clean, reproducible environment
+- Initialize git repo /w gitignore (Python/Docker/PyCharm/Emacs templates)
+- Create a base Dockerfile and docker-compose.yml
+- Define directory structure
 
-** Phase 3: UI/UX Refinement
-1. Build the Navbar with conditional rendering based on session state.
-2. Implement the Photos page using a grid layout.
-3. Style the landing page for a clean, "hub" aesthetic.
+** Phase 1: Placeholder Routes and Centralized Settings
+Goal: Verify "plumbing" before logic
+- Settings architecture
+- main.py /w basic routes: =/= (Home), =/login=, =/admin=
 
-** Phase 4: Hardening & Deployment
-1. Environment variable management (Immich URL, API Key, Secret Keys).
-2. Optimize Dockerfile (multi-stage builds for smaller images).
-3. (Optional) Set up a reverse proxy (Caddy/Nginx) for HTTPS.
+** Phase 2: Immich API integration
+Goal: Establish a stable connection to immich instance
+- immich_client.py using httpx
+- should represent basic immich interactions
+- api calls should be scoped, rate-limited, and specific
 
-* Configuration Ledger (v1)
-| Variable           | Description                          | Default        |
-|--------------------+--------------------------------------+----------------|
-| IMMICH_URL         | Base URL of your Immich instance     |                |
-| IMMICH_API_KEY     | Admin API key for data fetching      |                |
-| FEATURED_ALBUM_ID  | UUID of the carousel album           |                |
-| ADMIN_EMAIL        | Initial admin email for setup        |                |
-| DATABASE_URL       | Connection string for user DB        | sqlite:///./...|
+** Phase 3: Finalize landing page
+Goal: Turn the placeholder into something functional
+- Integrate Tailwind
+- Implement 'featured carousel' with photos from immich album (specific album specified in settings)
+- Announcements (pulled from local file)
+
+** Phase 4: Users and Admin
+- SQLAlchemy
+- "Request Account" functionality
+- Build admin dashboard to approve/deny requests, edit annoucements, and edit settings
+
+** Phase 5: Photo Upload
+- Implement a secure upload form
+- Pipe uploads directly to Immich API
+
+** Phase 6: Finalizing
+- Backups
