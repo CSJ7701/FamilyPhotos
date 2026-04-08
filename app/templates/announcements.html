@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-0 border rounded-xl bg-white shadow-sm overflow-hidden">
+    
+    <section class="p-8 border-b lg:border-b-0 lg:border-r border-gray-200 bg-gray-50/30">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Announcements</h2>
+            <p class="text-sm text-gray-500 mb-6">Search by title or content</p>
+            
+            <div class="relative">
+                <input type="text" id="announcementSearch" onkeyup="filterAnnouncements()" 
+                       placeholder="Filter announcements..." 
+                       class="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+            </div>
+        </div>
+        
+        <div id="announcementList" class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+            {% if announcements %}
+                {% for post in announcements %}
+                <article class="announcement-card bg-white p-5 rounded-lg border border-gray-200 shadow-sm" data-title="{{ post.title | lower }}">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-gray-900">{{ post.title }}</h3>
+                        <time class="text-xs font-mono text-gray-400 bg-gray-100 px-2 py-1 rounded">{{ post.date }}</time>
+                    </div>
+                    <div class="prose prose-sm text-gray-600">
+                        {{ post.html_content | safe }}
+                    </div>
+                </article>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                    <p class="text-gray-400 italic">No announcements have been posted yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="p-8">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Event Calendar</h2>
+            <p class="text-sm text-gray-500 mb-6">Filter by month and year</p>
+            
+            <div class="flex gap-3">
+                <select id="monthFilter" onchange="filterEvents()" class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="all">All Months</option>
+                    <option value="1">January</option><option value="2">February</option>
+                    <option value="3">March</option><option value="4">April</option>
+                    <option value="5">May</option><option value="6">June</option>
+                    <option value="7">July</option><option value="8">August</option>
+                    <option value="9">September</option><option value="10">October</option>
+                    <option value="11">November</option><option value="12">December</option>
+                </select>
+                
+                <select id="yearFilter" onchange="filterEvents()" class="w-32 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    {% for year in available_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div id="eventList" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
+            {% if events %}
+                {% for event in events %}
+                <div class="event-card flex items-center gap-4 bg-white p-4 rounded-lg border border-gray-100 shadow-sm hover:border-blue-200 transition-colors" 
+                     data-month="{{ event.month_val }}" data-year="{{ event.year_val }}">
+                    <div class="w-14 h-14 bg-blue-600 flex flex-col items-center justify-center rounded-lg shadow-inner">
+                        <span class="text-[10px] font-bold text-blue-100 uppercase tracking-tighter">{{ event.month_name }}</span>
+                        <span class="text-xl font-black text-white leading-none">{{ event.day }}</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900">{{ event.title }}</p>
+                        <p class="text-sm text-gray-500 flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            {{ event.location }}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+                <div id="noEventsMatch" class="hidden text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                    <p class="text-gray-400 italic">No events match these filters.</p>
+                </div>
+            {% else %}
+                <div class="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                    <p class="text-gray-400 italic">No upcoming events scheduled.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<script>
+function filterAnnouncements() {
+    const input = document.getElementById('announcementSearch').value.toLowerCase();
+    document.querySelectorAll('.announcement-card').forEach(card => {
+        card.style.display = card.dataset.title.includes(input) ? 'block' : 'none';
+    });
+}
+
+function filterEvents() {
+    const m = document.getElementById('monthFilter').value;
+    const y = document.getElementById('yearFilter').value;
+    const cards = document.querySelectorAll('.event-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        const matchM = (m === 'all' || card.dataset.month === m);
+        const matchY = (card.dataset.year === y);
+        if (matchM && matchY) {
+            card.classList.remove('hidden');
+            card.classList.add('flex');
+            visibleCount++;
+        } else {
+            card.classList.add('hidden');
+            card.classList.remove('flex');
+        }
+    });
+
+    document.getElementById('noEventsMatch').classList.toggle('hidden', visibleCount > 0);
+}
+
+// Run once on load to apply initial year filter
+document.addEventListener('DOMContentLoaded', filterEvents);
+</script>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative -mt-8 mb-12 w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-gray-900 overflow-hidden shadow-2xl">
+    <div class="swiper mySwiper w-full aspect-[21/9] md:aspect-[3/1]">
+        <div class="swiper-wrapper">
+            {% if carousel_error %}
+            <div class="swiper-slide flex flex-col items-center justify-center bg-gray-800 text-red-400 p-8 text-center">
+                <svg class="w-12 h-12 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <p class="text-xl font-bold">Something went wrong</p>
+                <p class="text-sm opacity-70">Unable to connect to the photo server. Please check settings.</p>
+            </div>
+            {% elif assets %}
+            {% for asset in assets %}
+            <div class="swiper-slide relative">
+                <img src="/proxy/image/{{ asset.id }}" class="w-full h-full object-contain brightness-75" alt="Family Photo">
+                <div class="absolute bottom-8 left-8 text-white z-10">
+                    <p class="text-sm font-medium opacity-80">{{ asset.fileCreatedAt[:10] }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="swiper-slide flex flex-col items-center justify-center bg-gray-800 text-gray-500 p-8 text-center">
+                <svg class="w-12 h-12 mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <p class="text-xl font-bold">No photos found</p>
+                <p class="text-sm opacity-70">The featured album appears to be empty.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if assets and not carousel_error %}
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next text-white opacity-50 hover:opacity-100 transition"></div>
+        <div class="swiper-button-prev text-white opacity-50 hover:opacity-100 transition"></div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+    <div class="lg:col-span-2 space-y-12">
+        <section>
+            <h2 class="text-3xl font-bold text-blue-600 mb-4">Welcome!</h2>
+            <p class="text-lg text-gray-600 leading-relaxed">
+		This is the {{ settings.family_name }} family dashboard. See below for announcements and upcoming events, or click the link at the top of this page to view public photos.</p>
+
+	    <p class="text-sm text-gray-600 leading-relaxed">For suggestions, comments, or concerns, please contact <a href="mailto:{{ settings.webmaster_email }}" class="text-blue-600 hover:text-blue-700 transition-colors">{{ settings.webmaster_name }}</a>.
+            </p>
+        </section>
+
+	<section class="space-y-6">
+	    <div class="flex items-center justify-between border-b pb-2">
+		<h3 class="text-xl font-semibold text-gray-800">Recent Announcements</h3>
+		<a href="/announcements" class="text-sm font-bold text-blue-700 hover:underline">Show All &rarr;</a>
+	    </div>
+	    
+	    <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+		{% if announcements %}
+		{% for post in announcements %}
+		<article class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 transition hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+			<h4 class="font-bold text-primary">{{ post.title }}</h4>
+			<time class="text-xs text-gray-400 uppercase font-medium">{{ post.date }}</time>
+                    </div>
+                    <div class="prose prose-sm max-w-none text-gray-600">
+			{{ post.html_content | safe }}
+                    </div>
+		</article>
+		{% endfor %}
+		{% else %}
+		<div class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-8 text-center">
+                    <p class="text-gray-400 italic">No announcements have been posted yet.</p>
+		</div>
+		{% endif %}
+	    </div>
+	</section>
+    </div>
+
+    <aside class="space-y-8">
+	<div class="bg-white p-6 rounded-2xl border border-blue-100">
+            <h3 class="text-lg font-bold text-blue-900 mb-4">Upcoming Events</h3>
+            
+            <div class="space-y-4 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+		{% if events %}
+                <ul class="space-y-4">
+                    {% for event in events %}
+                    <li class="flex gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-blue-600 rounded-lg flex flex-col items-center justify-center shadow-sm border border-white/20">
+                            <span class="text-xs font-bold text-white uppercase">{{ event.month_name }}</span>
+                            <span class="text-lg font-black text-white">{{ event.day }}</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-900 leading-tight">{{ event.title }}</p>
+                            <p class="text-xs text-gray-500">{{ event.location }}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+		{% else %}
+                <div class="text-center py-4">
+                    <p class="text-sm text-blue-400 italic">No events in the next 2 months.</p>
+                </div>
+		{% endif %}
+            </div>
+
+            <a href="/announcements" class="block text-center mt-6 text-xs font-bold text-blue-700 hover:underline border-t border-blue-100 pt-4">
+		Show All &rarr;
+            </a>
+	</div>
+    </aside>
+</div>
+<script>
+ const swiper = new Swiper(".mySwiper", {
+     loop: true,
+     autoplay: {
+	 delay: 20000,
+	 disableOnInteraction: false,
+     },
+     pagination: {
+	 el: ".swiper-pagination",
+	 clickable: true,
+     },
+     navigation: {
+	 nextEl: ".swiper-button-next",
+	 prevEl: ".swiper-button-prev",
+     },
+     effect: 'fade', // Optional: makes it look smoother than a slide
+     fadeEffect: {
+	 crossFade: true
+     },
+ });
+</script>
+{% endblock %}

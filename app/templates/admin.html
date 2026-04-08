@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-8">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-3xl font-black text-gray-900 tracking-tight">Admin Dashboard</h2>
+    </div>
+
+    <div class="flex border-b border-gray-200 mb-8 overflow-x-auto">
+        <button onclick="showTab('accounts')" class="tab-btn active-tab px-6 py-3 font-bold text-sm transition-all" id="btn-accounts">Account Manager</button>
+        <button onclick="showTab('settings')" class="tab-btn px-6 py-3 font-bold text-sm text-gray-500 hover:text-gray-700 transition-all" id="btn-settings">System Settings</button>
+    </div>
+
+    <div id="tab-accounts" class="tab-content space-y-8">
+        <section>
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                Pending Requests 
+            </h3>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">User</th>
+                            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Requested On</th>
+                            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% set pending = users | selectattr("is_active", "equalto", False) | list %}
+                        {% for user in pending %}
+                        <tr>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-900">{{ user.full_name }}</div>
+                                <div class="text-xs text-gray-400">{{ user.email }}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <form action="/admin/approve/{{ user.id }}" method="POST">
+                                        <button class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 transition">Approve</button>
+                                    </form>
+                                    <form action="/admin/deny/{{ user.id }}" method="POST">
+                                        <button class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100 transition">Deny</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="px-6 py-12 text-center text-gray-400 italic">No pending requests.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Active Accounts</h3>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">User</th>
+                            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Role</th>
+                            <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Settings</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% set active = users | selectattr("is_active", "equalto", True) | list %}
+                        {% for user in active %}
+                        <tr>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-900">{{ user.full_name }}</div>
+                                <div class="text-xs text-gray-400">{{ user.email }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if user.is_admin %}
+                                <span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded font-black uppercase">Admin</span>
+                                {% else %}
+                                <span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-black uppercase">Family</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-right">
+				<a href="/admin/edit-user/{{ user.id }}" class="inline-block text-gray-400 hover:text-blue-600 transition">
+				    <svg class="w-5 h-5 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+					      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+				    </svg>
+				</a>
+			    </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="tab-settings" class="tab-content hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800">Application Configuration</h3>
+                <p class="text-sm text-gray-400">Read-only values from your environment and settings class.</p>
+            </div>
+            <div class="divide-y divide-gray-50">
+                {% for key, value in settings_map.items() %}
+                <div class="grid grid-cols-3 p-6 hover:bg-gray-50 transition">
+                    <div class="text-sm font-mono font-bold text-blue-600">{{ key }}</div>
+                    <div class="col-span-2 text-sm text-gray-600 font-mono bg-gray-100 px-3 py-1 rounded self-start break-all">{{ value }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+ .active-tab {
+     border-bottom: 2px solid #2563eb;
+     color: #2563eb;
+ }
+</style>
+
+<script>
+ function showTab(tabName) {
+     // Hide all content
+     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+     // Remove active styling from all buttons
+     document.querySelectorAll('.tab-btn').forEach(btn => {
+         btn.classList.remove('active-tab', 'text-blue-600');
+         btn.classList.add('text-gray-500');
+     });
+     
+     // Show selected content
+     document.getElementById('tab-' + tabName).classList.remove('hidden');
+     // Set active button styling
+     const activeBtn = document.getElementById('btn-' + tabName);
+     activeBtn.classList.add('active-tab', 'text-blue-600');
+     activeBtn.classList.remove('text-gray-500');
+ }
+</script>
+{% endblock %}
