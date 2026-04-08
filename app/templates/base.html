@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{ title }} - Family Dashboard</title>
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	
+    </head>
+    <body class="bg-gray-50 text-gray-900 font-sans min-h-screen flex flex-col">
+	
+	<nav class="bg-white shadow-sm border-b border-gray-200">
+	    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div class="flex justify-between h-16">
+		    <div class="flex items-center">
+			<a href="/" class="text-xl font-bold text-blue-600">
+			    {{ settings.family_name }} Family
+			</a>
+			<div class="hidden md:ml-6 md:flex md:space-x-8">
+			    <a href="/photos" class="text-gray-500 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500">Photos</a>
+			</div>
+		    </div>
+
+		    <div class="flex items-center space-x-4">
+			{% if user %}
+			<span class="text-gray-500 text-sm hidden sm:block">Hello, {{ user.full_name }}</span>
+			<a href="/logout" class="text-gray-500 hover:text-gray-700">Logout</a>
+			{% else %}
+			<a href="/login" class="text-gray-500 hover:text-gray-700">Login</a>
+			{% endif %}
+			{% if user and user.is_admin %}
+                        <a href="/admin" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Admin</a>
+			{% endif %}
+		    </div>
+		</div>
+	    </div>
+	</nav>
+
+	<main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {% block content %}{% endblock %}
+	</main>
+
+	<footer class="mt-auto py-8 border-t border-gray-200 text-gray-500 text-sm">
+	    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+		
+		<div class="font-medium">
+		    {{ settings.family_name }} Family Dashboard
+		</div>
+
+		<div class="md:text-right">
+		    <p class="font-small text-gray-800">Webmaster:</p>
+		    <a href="mailto:{{ settings.webmaster_email }}" class="text-blue-600 hover:text-blue-700 transition-colors">
+			{{ settings.webmaster_name }}
+		    </a>
+		</div>
+		
+	    </div>
+	</footer>
+    </body>
+</html>

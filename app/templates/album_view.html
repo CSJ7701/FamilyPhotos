@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto mt-8 px-4">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-black">Album Photos</h2>
+        <a href="/photos" class="text-blue-600 hover:underline">← Back to Albums</a>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for asset in assets %}
+	<div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100 shadow-sm group">
+	    <img src="/proxy/thumb/{{ asset.id }}" 
+		 class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition"
+		 onclick="openLightbox('{{ asset.id }}', '{{ asset.type }}')">
+	    
+	    {% if asset.type == 'VIDEO' %}
+	    <div class="absolute bottom-2 right-2 bg-black/50 text-white p-1.5 rounded-full backdrop-blur-sm">
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+		    <path d="M8 5v14l11-7z" />
+		</svg>
+	    </div>
+	    {% endif %}
+	</div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="lightbox" class="fixed inset-0 bg-black/95 hidden z-50 flex flex-col items-center justify-center p-4">
+    <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white text-4xl">&times;</button>
+    
+    <div class="relative max-w-5xl max-h-[80vh] flex flex-col items-center">
+        <img id="lightbox-img" src="" class="max-w-full max-h-full rounded shadow-2xl hidden">
+        
+        <div id="video-placeholder" class="hidden flex flex-col items-center text-white space-y-4">
+            <div class="bg-gray-800 p-8 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <p class="text-xl font-bold">Video File</p>
+            <p class="text-gray-400">In-site playback is disabled. Download to view.</p>
+        </div>
+
+        <div class="mt-8">
+            <a id="download-link" href="#" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download Original
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+ function openLightbox(assetId, type) {
+     const lightbox = document.getElementById('lightbox');
+     const imgElement = document.getElementById('lightbox-img');
+     const downloadBtn = document.getElementById('download-link');
+     const videoPlaceholder = document.getElementById('video-placeholder');
+
+     // Set the download link for everyone
+     downloadBtn.href = '/proxy/download/' + assetId;
+
+     if (type === 'VIDEO') {
+         imgElement.classList.add('hidden');
+         videoPlaceholder.classList.remove('hidden');
+     } else {
+         imgElement.src = '/proxy/image/' + assetId;
+         imgElement.classList.remove('hidden');
+         videoPlaceholder.classList.add('hidden');
+     }
+     
+     lightbox.classList.remove('hidden');
+ }
+ function closeLightbox() {
+     document.getElementById('lightbox').classList.add('hidden');
+     document.getElementById('lightbox-img').src = '';
+ }
+</script>
+{% endblock %}

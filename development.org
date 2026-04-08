@@ -1,0 +1,89 @@
+#+TITLE: Family Hub Project Plan
+#+AUTHOR: Project Lead
+#+DATE: [2026-04-03]
+#+OPTIONS: toc:2
+
+* Project Overview
+Create a containerized, Python-based web application to serve as a central "landing zone" for family updates and Immich-integrated photo viewing.
+
+* Technical Requirements
+** Backend
+- *Language:* Python 3.11+
+- *Framework:* FastAPI
+- *Auth:* FastAPI Users
+- *DB:* SQLite
+- *Settings:* pydantic-settings
+- *Integration:* Immich REST API (~httpx~).
+- *Secondary*: Slowapi (rate-limiting), middleware
+
+** Frontend
+- *Templating:* Jinja2
+- *Styling:* Tailwind CSS
+- *Carousel:* Swiper.js or a simple CSS-based scroll snapper.
+
+** Infrastructure
+- *Containerization:* Docker & Docker Compose.
+- *Persistence:* Docker volumes for the user database and local configuration files.
+
+* Functional Requirements
+** Public Landing Page
+- [ ] *Announcements Section:* Markdown-based text. Pulled from a local file.
+- [ ] *Immich Carousel:* Fetch images from a specific ~ALBUM_ID~ via the Immich API.
+- [ ] *Navigation Bar:* Context-aware links (Login/Logout, Photos, Profile).
+
+** User Management
+- [ ] *Account Requests:* Unauthenticated users can submit a request (Name, Email, Password). Requests are reviewed by an admin.
+- [ ] *Authentication:* Login/Password hashing (Argon2 or bcrypt). All users will access immich content using a master API key.
+- [ ] *Admin Dashboard:*
+  - Approve/Deny pending account requests.
+  - Configure Immich API URL and default Album ID for carousel.
+  - Configure default album for photo upload, along with other settings.
+  - Manage existing users.
+
+** Settings Management
+- [ ] *Config File*: Simple config file or env parsing (pydantic-settings)
+  - Admin can adjust settings from the web interface
+  - Changing settings writes to the config file
+  - Settings changed in-interface should persist server reboot
+
+** Photos Page (Protected)
+- [ ] *Authorization:* Redirect to login if no active session.
+- [ ] *Album List:* Pull all public/shared albums from the Immich instance.
+- [ ] *Photo Upload*: 'Upload' button should allow users to upload local photos to the Immich server. These should be placed into an admin specified album within Immich for sorting later.
+
+* Development Process
+
+** Phase 0: Initial Env and Directory Setup
+Goal: Establish a clean, reproducible environment
+- Initialize git repo /w gitignore (Python/Docker/PyCharm/Emacs templates)
+- Create a base Dockerfile and docker-compose.yml
+- Define directory structure
+
+** Phase 1: Placeholder Routes and Centralized Settings
+Goal: Verify "plumbing" before logic
+- Settings architecture
+- main.py /w basic routes: =/= (Home), =/login=, =/admin=
+
+** Phase 2: Immich API integration
+Goal: Establish a stable connection to immich instance
+- immich_client.py using httpx
+- should represent basic immich interactions
+- api calls should be scoped, rate-limited, and specific
+
+** Phase 3: Finalize landing page
+Goal: Turn the placeholder into something functional
+- Integrate Tailwind
+- Implement 'featured carousel' with photos from immich album (specific album specified in settings)
+- Announcements (pulled from local file)
+
+** Phase 4: Users and Admin
+- SQLAlchemy
+- "Request Account" functionality
+- Build admin dashboard to approve/deny requests, edit annoucements, and edit settings
+
+** Phase 5: Photo Upload
+- Implement a secure upload form
+- Pipe uploads directly to Immich API
+
+** Phase 6: Finalizing
+- Backups

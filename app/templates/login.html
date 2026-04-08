@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+    <h2 class="text-2xl font-bold text-center mb-6">Login</h2>
+    
+    {% if request.query_params.get('error') == 'invalid' %}
+    <p class="mb-4 text-sm text-red-500 bg-red-50 p-2 rounded">Invalid email or password.</p>
+    {% elif request.query_params.get('error') == 'pending' %}
+    <p class="mb-4 text-sm text-orange-500 bg-orange-50 p-2 rounded">Your account is awaiting admin approval.</p>
+    {% endif %}
+
+    <form action="/login" method="POST" class="space-y-4">
+        <input type="email" name="email" placeholder="Email" required class="w-full p-2 border rounded-md">
+        <input type="password" name="password" placeholder="Password" required class="w-full p-2 border rounded-md">
+        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md font-bold">Sign In</button>
+    </form>
+    
+    <p class="mt-4 text-center text-xs text-gray-500">
+        Don't have an account? <a href="/request-account" class="text-blue-600 hover:underline">Request Access</a>
+    </p>
+</div>
+{% endblock %}

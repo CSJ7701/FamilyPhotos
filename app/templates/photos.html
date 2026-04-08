@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto mt-8 px-4">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-black">Photo Albums</h2>
+        {% if upload_enabled %}
+	<a href="/upload" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-bold transition">
+	    Upload
+	</a>
+	{% else %}
+	<button onclick="showToast('{{ upload_error }}', 'error')" class="bg-gray-300 text-gray-500 px-6 py-2 rounded-full font-bold cursor-not-allowed">
+	    Upload
+	</button>
+	{% endif %}
+    </div>
+
+    {% if not albums %}
+    <div class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-20 text-center">
+	<p class="text-gray-400 font-medium">No albums have been designated for public access. Please contact an administrator.</p>
+    </div>
+    {% else %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+	{% for album in albums %}
+	<a href="/photos/album/{{ album.id }}" class="group block">
+            <div class="aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 mb-3 shadow-sm group-hover:shadow-xl transition-all">
+		<img src="/proxy/thumb/{{ album.albumThumbnailAssetId }}" 
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            </div>
+            <h3 class="font-bold text-gray-900 group-hover:text-blue-600 transition">{{ album.albumName }}</h3>
+            <p class="text-xs text-gray-400 uppercase font-bold tracking-widest">{{ album.assetCount }} Photos</p>
+	</a>
+	{% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-3"></div>
+
+<script>
+ function showToast(message, type = 'success') {
+     const container = document.getElementById('toast-container');
+     const toast = document.createElement('div');
+     
+     const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+     
+     toast.className = `${bgColor} text-white px-6 py-3 rounded-xl shadow-lg font-bold transform transition-all duration-300 translate-y-10 opacity-0`;
+     toast.innerText = message;
+     
+     container.appendChild(toast);
+
+     // Animate in
+     setTimeout(() => {
+         toast.classList.remove('translate-y-10', 'opacity-0');
+     }, 10);
+
+     // Auto-remove after 4 seconds
+     setTimeout(() => {
+         toast.classList.add('opacity-0');
+         setTimeout(() => toast.remove(), 300);
+     }, 4000);
+ }
+
+ // Check URL parameters on load
+ window.onload = () => {
+     const params = new URLSearchParams(window.location.search);
+     if (params.get('status') === 'success') {
+         showToast('Upload successful!');
+         // Clean up the URL without refreshing
+         window.history.replaceState({}, document.title, window.location.pathname);
+     }
+ };
+</script>
+{% endblock %}
+
+
