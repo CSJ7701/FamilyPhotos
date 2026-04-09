@@ -123,5 +123,5 @@ Users are also able to upload images directly to the immich instance. Upload cap
 
 ** Admin Dashboard
 Accessible from the main navbar whenever logged in as an admin, the administrator's dashboard allows you to approve/deny access requests, adjust settings for existing user accounts, and browse server settings.
-[[/assets/Admin.png]]
+[[/assets/Admin-Dashboard.png]]
 
