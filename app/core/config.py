@@ -4,7 +4,7 @@ from pydantic import DirectoryPath
 from typing import Optional
 
 class Settings(BaseSettings):
-    database_url: str = "sqlite:///./data/family_hub.db"
+    database_url: str = "sqlite+aiosqlite:///./data/family_hub.db"
 
     immich_api_url: str
     immich_api_key: str # Loaded from .env via Docker
