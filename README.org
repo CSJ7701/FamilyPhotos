@@ -113,7 +113,7 @@ The login page. Users without accounts can request access here, for approval by 
 
 ** Albums
 The album page allows users to browse albums located on the configured Immich instance. Albums are only visible on this page if they have been designated as an "allowed album" in the docker compose environment.
-[[/assets/Photo-Album.png]]
+[[/assets/Photo-Albums.png]]
 
 Users can browse all photos that are stored within those albums. While video files are shown in this view, video playback is not supported. Users can, however, download the video files directly and play them locally (though download speeds may be slow).
 [[/assets/Album-View.png]]
