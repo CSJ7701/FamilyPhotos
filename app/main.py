@@ -3,6 +3,8 @@ from fastapi import FastAPI, Request, Response, Depends, Form, UploadFile, File
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import HTTPException
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -88,6 +90,37 @@ def sync_carousel_cache():
 scheduler = BackgroundScheduler()
 scheduler.add_job(sync_carousel_cache, 'interval', minutes=settings.immich_showcase_cache_cleanup_interval)
 scheduler.start()
+
+async def error_page(request: Request, status_code: int, message: str):
+    user = None
+    try:
+        user = await get_current_user(request)
+    except:
+        pass
+    return templates.TemplateResponse(
+        request=request,
+        name="error.html",
+        status_code=status_code,
+        context={
+            "title": f"Error {status_code}",
+            "status_code": status_code,
+            "message": message,
+            "user": user,
+            "settings": settings
+        })
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return await error_page(request, exc.status_code, exc.detail)
+
+@app.exception_handler(RateLimitExceeded)
+async def custom_rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return await error_page(request, 429, "Too many requests. Please slow down and try again later.")
+
+@app.exception_handler(500)
+async def internal_server_error_handler(request: Request, exc: Exception):
+    logger.error(f"Internal Server Error: {exc}")
+    return await error_page(request, 500, "Something went wrong on our end.")
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
@@ -465,7 +498,7 @@ async def album_detail(
 async def proxy_thumbnail(request: Request, asset_id: str, user: User = Depends(get_current_user)):
     if not user:
         logger.warning("Unauthorized access attempt to thumbnail api")
-        return Response(status_code=401)
+        raise HTTPException(status_code=401)
 
     thumb_cache = CACHE_DIR / "thumbs"
     thumb_cache.mkdir(parents=True, exist_ok=True)
@@ -509,7 +542,7 @@ async def proxy_download(request: Request, asset_id: str, user: User = Depends(g
     """Fetch the original file (photo or video) from Immich and stream it to the user."""
     if not user:
         logger.warning(f"Unauthorized access attempt to download file: {asset_id}")
-        return Response(status_code=401)
+        raise HTTPException(status_code=401)
 
     try:
         content = await immich_client.download_asset(asset_id)
