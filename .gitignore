@@ -9,4 +9,5 @@ data/announcements.yaml
 data/logs/
 data/cache/
 
+docker-compose.yml
 development.org
