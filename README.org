@@ -1,7 +1,26 @@
 
 * Family Photo Site
+:PROPERTIES:
+:TOC:      :include all :force (nothing) :ignore (nothing) :local (nothing)
+:END:
 
 This project is meant to serve as an attractive, clean frontend for an Immich Server for families. It provides basic photo browsing, upload, and download capabilities, alongside user management, and simplified family announcements.
+
+:CONTENTS:
+- [[#getting-started][Getting Started]]
+  - [[#docker-compose][Docker Compose]]
+    - [[#variables][Variables]]
+  - [[#env][.env]]
+  - [[#command-line][Command Line]]
+  - [[#announcements][Announcements]]
+- [[#features][Features]]
+  - [[#initial-setup][Initial Setup]]
+  - [[#dashboard][Dashboard]]
+  - [[#login][Login]]
+  - [[#albums][Albums]]
+  - [[#admin-dashboard][Admin Dashboard]]
+:END:
+
 
 * Getting Started
 In order to run an instance of this server, you will need to set up a =docker-compose.yml= file, and a =.env= file in whichever directory you wish to run this server from. Be aware that the server will create a =data/= directory in this folder.
@@ -91,6 +110,12 @@ events:
     date: "2026-05-10"
     location: "Somewhere Else"
 #+end_src
+
+** Updating
+If updates are made to this repo and you wish to update your server follow these steps:
+- Stop the server by navigating to the directory where you saved your =docker-compose.yml= file, and run =docker compose down=.
+- Pull the latest image with =docker compose pull=.
+- Restart the container with =docker compose up=.
 
 * Features
 
